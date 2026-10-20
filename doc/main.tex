@@ -1,0 +1,113 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, top=2.6cm, bottom=2.5cm, left=2.8cm, right=2.8cm, headheight=14pt, headsep=0.8cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english, french]{babel}
+\usepackage{newtxtext,newtxmath}
+\usepackage{microtype}
+\usepackage{enumitem}
+\setlist[itemize]{label=\textbullet, leftmargin=1.5em, topsep=4pt, itemsep=3pt, parsep=0pt}
+\setlist[enumerate]{leftmargin=2em, topsep=5pt, itemsep=4pt, parsep=0pt}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{30, 50, 82}
+\definecolor{secondary}{RGB}{117, 96, 61}
+\definecolor{darkgray}{RGB}{75, 78, 82}
+\definecolor{rulegray}{RGB}{205, 207, 209}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    urlcolor=secondary,
+    pdftitle={Propositions de notions - Fouille de graphes et réseaux sociaux},
+    pdfsubject={Propositions de sujets et tâches pratiques}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\linespread{1.06}
+\setlength{\emergencystretch}{2em}
+
+\titleformat{\section}[block]
+  {\Large\bfseries\color{primary}}
+  {}{0pt}{}
+  [\vspace{2pt}{\color{secondary}\titlerule[0.6pt]}]
+\titlespacing*{\section}{0pt}{0pt}{12pt}
+\titleformat{\subsection}[block]
+  {\normalsize\sffamily\bfseries\color{primary}}
+  {}{0pt}{}
+\titlespacing*{\subsection}{0pt}{12pt}{4pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\sffamily\color{darkgray}\textsc{Fouille de graphes et réseaux sociaux}}
+\fancyhead[R]{\footnotesize\sffamily\color{darkgray}Propositions de sujets}
+\fancyfoot[C]{\footnotesize\sffamily\color{darkgray}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{\footnotesize\sffamily\color{darkgray}\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+\begin{document}
+
+% En-tête du document
+\begin{center}
+    {\small\sffamily\scshape\color{secondary}Document de cadrage}\\[8pt]
+    {\LARGE\bfseries\color{primary}Propositions de notions\\[-1pt]
+    et tâches pratiques}\\[8pt]
+    {\large\sffamily Cours : Fouille de graphes et réseaux sociaux}\\[12pt]
+    {\color{secondary}\rule{0.16\linewidth}{1pt}}\\[10pt]
+    {\small\color{darkgray}Format d'évaluation : Présentation orale (15 min)\quad\textbullet\quad Démonstration pratique (5 min)}\\[3pt]
+    {\small\color{darkgray}Questions (5 min)}\\[5pt]
+    {\footnotesize\color{darkgray}Livrables Moodle : support de présentation, articles de référence et code source de la démonstration}
+\end{center}
+\vspace{8pt}
+\thispagestyle{plain}
+
+\vspace{4pt}
+
+\section*{\textcolor{primary}{Attaques adverses par injection de nœuds (\textit{Node Injection Attacks}) et robustesse sur graphes attribués par du texte}}
+
+\textbf{\textcolor{secondary}{Plan des tâches du projet (Format Cahier des Charges) :}}
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item Présenter le modèle de menace réaliste d'injection de nœuds malveillants (\textit{Graph Injection Attacks -- GIA}) $G' = (V \cup V_{\text{inj}}, E \cup E_{\text{inj}}, X \cup X_{\text{inj}})$ et expliquer comment le passage de messages GNN (Chapitre 2) amplifie le bruit d'un faux profil vers ses voisins légitimes.
+    \item Expliquer le passage des attaques par vecteurs continus (\textbf{TDGIA}) aux attaques réalistes au niveau du texte sur les graphes attribués par du texte (\textbf{WTGIA / ITGIA}, NeurIPS 2024 ; \textbf{GraphTextack}, 2025).
+    \item Développer une architecture défensive récente combinant masquage de chemins par marches aléatoires (Chapitres 1 et 2) et mélange d'experts différentiellement privés (\textbf{DMGAN + DPMoE}).
+    \item Réaliser une démonstration pratique : injecter progressivement de faux nœuds dans un graphe de citation ou social pour visualiser l'effondrement d'un GCN standard puis la restauration de la précision par filtrage défensif.
+\end{enumerate}
+
+\subsection*{1. Formalisation théorique et modélisation sur graphe}
+La détection de comportements suspects est identifiée comme une tâche clé des réseaux sociaux. Or, contrairement aux attaques de modification d'arêtes existantes (irréalistes car un pirate ne peut pas supprimer l'amitié entre deux utilisateurs tiers), les \textbf{attaques par injection de nœuds (GIA)} consistent à créer un petit ensemble de faux profils $V_{\text{inj}}$ (\textit{Sybils}) sous contrainte de budget $|V_{\text{inj}}| \le \Delta$ et de degré $d_u \le b$ afin de maximiser le taux d'erreur du GNN sur les nœuds cibles légitimes $V_T$ :
+\[
+\max_{A_{\text{inj}}, X_{\text{inj}}} \;\sum_{v \in V_T} \mathbb{I}\!\left( f_{\theta^*}(G', v) \neq y_v \right) \quad \text{où} \quad G' = \left( \begin{bmatrix} A & A_{\text{inj}} \\ A_{\text{inj}}^T & O \end{bmatrix}, \begin{bmatrix} X \\ X_{\text{inj}} \end{bmatrix} \right)
+\]
+Sur les \textbf{graphes attribués par du texte (\textit{Text-Attributed Graphs -- TAGs})}, un attaquant ne peut pas injecter directement un vecteur continu dense $X_{\text{inj}}$ en base de données : il doit publier du texte cohérent (biographie, commentaire). L'approche \textbf{WTGIA} (\textbf{NeurIPS 2024}) résout ce défi en générant d'abord un plongement binaire parcimonieux par \textit{Row-wise Constrained FGSM} (limitant les entrées non nulles selon un ratio de parcimonie $S$), puis en inversant ce vecteur en texte naturel via un grand modèle de langage (LLM). En défense, face à l'effondrement des méthodes classiques au-delà de 300 nœuds injectés ($>50\,\%$ d'erreurs), le cadre \textbf{DMGAN + DPMoE} purifie la structure par auto-encodeur à masquage de marches aléatoires et calibre un bruit gaussien différentiellement privé via un mélange d'experts.
+
+\subsection*{2. Tâches pratiques et protocole de démonstration (5 minutes)}
+\begin{itemize}
+    \item \textbf{Jeu de données :} Graphes attribués \textit{Cora}, \textit{CiteSeer} ou \textit{Ogbn-arxiv}.
+    \item \textbf{Bibliothèques Python et dépôts :} Référentiel \textbf{Graph Robustness Benchmark (GRB)} / \texttt{DeepRobust} et \texttt{PyTorch Geometric}.
+    \item \textbf{Scénario de la démonstration :} Évaluation initiale d'un modèle GCN propre sur \textit{Cora}. Exécution en direct d'une attaque par injection progressive de nœuds malveillants (de 10 à 300 faux nœuds connectés stratégiquement) : affichage en temps réel de la chute drastique de la précision sur le voisinage cible, suivi de l'activation d'un mécanisme de défense structurelle (élagage spectral / débruitage) qui neutralise les arêtes injectées $E_{\text{inj}}$.
+\end{itemize}
+
+\subsection*{3. Références bibliographiques associées}
+\begin{itemize}
+    \item Sun, Y., et al. (2023). \textit{Let Graph be the Go Board: Gradient-free Node Injection Attack for Graph Neural Networks via Reinforcement Learning}. Proceedings of the AAAI Conference on Artificial Intelligence (AAAI 2023).
+    \item Lukas, J., et al. (2023). \textit{Adversarial Training for Graph Neural Networks: Pitfalls, Solutions, and New Directions}. Advances in Neural Information Processing Systems (NeurIPS 2023).
+    \item Lei, R., et al. (2024). \textit{Text-Level Graph Injection Attacks on Text-Attributed Graphs (WTGIA / ITGIA)}. Advances in Neural Information Processing Systems (NeurIPS 2024).
+    \item Zhang, H., et al. (2025). \textit{Robustness Inspired Graph Backdoor Defense}. International Conference on Learning Representations (ICLR 2025).
+\end{itemize}
+
+\newpage
+
+\end{document}
