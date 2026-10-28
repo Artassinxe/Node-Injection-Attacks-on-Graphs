@@ -1,0 +1,25 @@
+\babel@toc {french}{}\relax 
+\contentsline {section}{\numberline {1}Paradigmes d'optimisation}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Introduction et modélisation des GIA}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Attaques fondées sur les gradients}{2}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Topologie et apprentissage séquentiel}{2}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Défenses contre les injections}{2}{subsection.1.4}%
+\contentsline {subsection}{\numberline {1.5}Synthèse critique et démonstration}{2}{subsection.1.5}%
+\contentsline {section}{\numberline {2}Anatomie d'une injection : connexions et attributs}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Modèle de menace et propagation}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Choix des connexions : déterminer $A_{\text {inj}}$}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Choix des attributs : générer $X_{\text {inj}}$}{3}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Détecter et neutraliser l'injection}{3}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Synthèse et démonstration}{4}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Évolution du domaine : la course aux armements}{4}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Genèse : pourquoi injecter plutôt que modifier ?}{4}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Première génération : discrétisation et passage à l'échelle}{4}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Deuxième génération : évasion à grande échelle}{4}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Riposte : exploiter les failles des attaques}{4}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Troisième génération : furtivité, bilan et démonstration}{5}{subsection.3.5}%
+\contentsline {section}{\numberline {4}Propriétés des graphes : degré, homophilie, spectre et échelle}{5}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Connectivité locale et modèle d'injection}{5}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Degré et centralité dans les attaques}{5}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Statistiques globales et optimisation séquentielle}{5}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Homophilie et mécanismes de défense}{5}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Synthèse multicritère et démonstration}{6}{subsection.4.5}%

@@ -1,0 +1,267 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[a4paper,margin=2.6cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{newtxtext,newtxmath}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{30,50,82}
+\definecolor{secondary}{RGB}{117,96,61}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    pdftitle={Propositions de plans sur les attaques par injection de nœuds},
+    pdfsubject={Plans de présentation sur les attaques et défenses des GNN}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{2em}
+\setlist[itemize]{leftmargin=1.5em,itemsep=3pt,topsep=3pt}
+
+\titleformat{\section}
+  {\Large\bfseries\color{primary}}
+  {\thesection.}{0.5em}{}
+  [\vspace{2pt}{\color{secondary}\titlerule[0.6pt]}]
+\titleformat{\subsection}
+  {\normalsize\sffamily\bfseries\color{primary}}
+  {\thesubsection}{0.5em}{}
+
+\newcommand{\duree}[1]{\hfill\textit{#1}}
+
+\begin{document}
+
+\begin{center}
+    {\small\sffamily\scshape\color{secondary}Document de travail}\\[8pt]
+    {\LARGE\bfseries\color{primary}Propositions de plans}\\[4pt]
+    {\large Attaques par injection de nœuds et robustesse des GNN}\\[10pt]
+    {\color{secondary}\rule{0.18\linewidth}{1pt}}\\[8pt]
+    {\small Présentation orale : 15 minutes\quad\textbullet\quad Démonstration : 5 minutes}
+\end{center}
+
+\tableofcontents
+\vspace{1em}
+
+\section{Paradigmes d'optimisation}
+
+\textbf{Fil conducteur.} Classer les attaques selon la façon dont elles résolvent
+le problème d'optimisation, puis examiner les défenses et les adaptations des
+attaquants.
+
+\subsection{Introduction et modélisation des GIA}\duree{3 min}
+\begin{itemize}
+    \item Rappeler le passage de messages dans les réseaux de neurones sur graphes
+    (GNN) et expliquer la vulnérabilité créée par l'agrégation des voisinages.
+    \item Comparer l'injection de nœuds (GIA) à la modification du graphe (GMA),
+    en soulignant le réalisme de l'injection et sa formalisation par blocs à
+    l'aide de $A'$ et $X'$.
+    \item Présenter les contraintes usuelles : budget de nœuds, degré maximal,
+    et injection en une fois ou de manière séquentielle.
+\end{itemize}
+
+\subsection{Attaques fondées sur les gradients}\duree{3 min}
+\begin{itemize}
+    \item Exposer le problème de discrétisation : l'ajout d'une arête est une
+    décision binaire, alors que les méthodes d'optimisation opèrent souvent
+    dans un espace continu.
+    \item Présenter les premières approches gloutonnes, dont Greedy et
+    Greedy-GAN, ainsi que leur coût de calcul.
+    \item Expliquer la linéarisation du modèle substitut et l'approximation
+    rapide fondée sur le signe du gradient, avec FGSM adapté et AFGSM, pour
+    traiter des graphes de grande taille.
+\end{itemize}
+
+\subsection{Topologie et apprentissage séquentiel}\duree{3 min}
+\begin{itemize}
+    \item Décrire la vulnérabilité topologique des nœuds de faible degré et
+    l'exploitation de cette propriété pour sélectionner les arêtes d'injection
+    dans TDGIA.
+    \item Présenter l'optimisation sans dérivation directe par rapport au graphe,
+    formulée comme un processus de décision markovien (MDP) et résolue par
+    apprentissage par renforcement hiérarchique dans NIPA.
+\end{itemize}
+
+\subsection{Défenses contre les injections}\duree{3 min}
+\begin{itemize}
+    \item Introduire la rupture de l'homophilie locale comme faiblesse exploitable
+    par les attaques par injection.
+    \item Comparer les mécanismes de filtrage fondés sur l'homophilie ou
+    l'attention (GNNGuard, EGNNGuard et RGAT), qui peuvent écarter les arêtes
+    suspectes.
+    \item Présenter les méthodes qui stabilisent les représentations internes :
+    RobustGCN, LayerNorm et l'entraînement contradictoire FLAG.
+\end{itemize}
+
+\subsection{Synthèse critique et démonstration}\duree{3 min + 5 min de démonstration}
+\begin{itemize}
+    \item Montrer comment la régularisation d'homophilie HAO permet aux attaques
+    de préserver leur discrétion et de contourner certaines défenses.
+    \item Comparer les méthodes selon leur complexité et leur transférabilité
+    entre architectures GNN.
+    \item Conclure par une démonstration pratique d'injection et de défense.
+\end{itemize}
+
+\section{Anatomie d'une injection : connexions et attributs}
+
+\textbf{Fil conducteur.} Décomposer une attaque en deux décisions techniques :
+où connecter les nœuds injectés ($A_{\text{inj}}$) et quels attributs leur
+attribuer ($X_{\text{inj}}$).
+
+\subsection{Modèle de menace et propagation}\duree{3 min}
+\begin{itemize}
+    \item Expliquer la vulnérabilité structurelle des GNN et distinguer la
+    modification du graphe (GMA) de l'injection de nœuds (GIA).
+    \item Définir les cadres d'attaque : empoisonnement (\textit{poisoning}),
+    notamment NIPA et AFGSM, ou évasion (\textit{evasion}), notamment TDGIA et
+    HAO ; distinguer également les attaques ciblées des attaques globales.
+\end{itemize}
+
+\subsection{Choix des connexions : déterminer \texorpdfstring{$A_{\text{inj}}$}{A inj}}\duree{3 min}
+\begin{itemize}
+    \item Comparer la connexion directe à la cible et la connexion indirecte par
+    l'intermédiaire de ses voisins.
+    \item Présenter les stratégies fondées sur les gradients de perte : Greedy,
+    AFGSM et MetaGIA.
+    \item Examiner les stratégies heuristiques et séquentielles : score de
+    vulnérabilité topologique dans TDGIA et sélection d'actions par renforcement
+    dans NIPA.
+\end{itemize}
+
+\subsection{Choix des attributs : générer \texorpdfstring{$X_{\text{inj}}$}{X inj}}\duree{3 min}
+\begin{itemize}
+    \item Comparer l'optimisation d'attributs continus, par descente de gradient
+    projetée (PGD) ou optimisation lisse dans TDGIA, aux choix discrets fondés
+    sur le signe du gradient.
+    \item Traiter le réalisme des attributs à l'aide de contraintes de
+    cooccurrence (AFGSM), d'un discriminateur adversaire (Greedy-GAN) et de la
+    préservation de l'homophilie (HAO).
+\end{itemize}
+
+\subsection{Détecter et neutraliser l'injection}\duree{3 min}
+\begin{itemize}
+    \item Expliquer pourquoi une injection naïve est plus facile à bloquer,
+    notamment lorsqu'elle modifie la distribution d'homophilie.
+    \item Décrire les défenses structurelles par élagage d'arêtes et seuil de
+    similarité cosinus, comme GNNGuard et EGNNGuard.
+    \item Comparer les défenses appliquées aux couches de convolution :
+    normalisation (LayerNorm), distributions gaussiennes (RobustGCN) et
+    architectures alternatives (SGCN, APPNP et TAGCN).
+\end{itemize}
+
+\subsection{Synthèse et démonstration}\duree{3 min + 5 min de démonstration}
+\begin{itemize}
+    \item Construire une matrice de synthèse comparant puissance d'attaque,
+    coût algorithmique et furtivité face aux défenses.
+    \item Présenter le protocole expérimental et lancer la démonstration.
+\end{itemize}
+
+\section{Évolution du domaine : la course aux armements}
+
+\textbf{Fil conducteur.} Raconter l'évolution des méthodes comme une succession
+d'attaques et de réponses défensives, depuis les premières attaques par
+modification jusqu'aux attaques furtives.
+
+\subsection{Genèse : pourquoi injecter plutôt que modifier ?}\duree{3 min}
+\begin{itemize}
+    \item Présenter les limites des premières attaques sur graphes, telles que
+    Nettack, puis l'émergence des attaques par faux nœuds.
+    \item Formaliser l'injection et expliquer l'effet théorique d'un nœud
+    malveillant sur les couches de convolution d'un GNN.
+\end{itemize}
+
+\subsection{Première génération : discrétisation et passage à l'échelle}\duree{3 min}
+\begin{itemize}
+    \item Présenter les approches pionnières d'empoisonnement : algorithmes
+    gloutons (Greedy-GAN), Q-learning hiérarchique (NIPA) et linéarisation
+    rapide (AFGSM).
+    \item Comparer leur complexité algorithmique, de $\mathcal{O}(n^2)$ à
+    $\mathcal{O}(n)$ selon les méthodes et les hypothèses considérées.
+\end{itemize}
+
+\subsection{Deuxième génération : évasion à grande échelle}\duree{3 min}
+\begin{itemize}
+    \item Présenter le passage à des attaques en boîte noire au moment de
+    l'inférence, sans réentraîner le GNN, illustré par le contexte du benchmark
+    KDD Cup 2020.
+    \item Expliquer TDGIA et son exploitation de la topologie pour maximiser
+    l'impact avec une proportion réduite de nœuds injectés.
+\end{itemize}
+
+\subsection{Riposte : exploiter les failles des attaques}\duree{3 min}
+\begin{itemize}
+    \item Comparer l'effet des GIA et des GMA sur l'homophilie du graphe, à
+    partir des résultats théoriques et empiriques.
+    \item Présenter les défenses fondées sur le filtrage de l'homophilie
+    (GNNGuard), la variance (RobustGCN), la normalisation (LayerNorm) et
+    l'entraînement robuste.
+\end{itemize}
+
+\subsection{Troisième génération : furtivité, bilan et démonstration}\duree{3 min + 5 min de démonstration}
+\begin{itemize}
+    \item Expliquer comment l'objectif harmonieux HAO vise à préserver
+    l'homophilie et à contourner les défenses.
+    \item Présenter un tableau comparatif des méthodes, puis lancer la
+    démonstration interactive.
+\end{itemize}
+
+\section{Propriétés des graphes : degré, homophilie, spectre et échelle}
+
+\textbf{Fil conducteur.} Organiser l'exposé autour des propriétés structurelles
+qui déterminent la vulnérabilité des nœuds, la discrétion des injections et
+l'efficacité des défenses.
+
+\subsection{Connectivité locale et modèle d'injection}\duree{3 min}
+\begin{itemize}
+    \item Montrer comment la topologie locale influe sur les prédictions d'un
+    GNN.
+    \item Formaliser l'injection de nœuds et les budgets imposés à la structure
+    du graphe.
+\end{itemize}
+
+\subsection{Degré et centralité dans les attaques}\duree{3 min}
+\begin{itemize}
+    \item Analyser la vulnérabilité des nœuds en fonction de leur degré et
+    expliquer pourquoi les nœuds de faible degré peuvent être plus sensibles.
+    \item Examiner l'influence de la normalisation de la matrice d'adjacence,
+    notamment la normalisation par ligne et la normalisation symétrique
+    $\tilde{D}^{-1/2}\tilde{A}\tilde{D}^{-1/2}$.
+    \item Relier ces propriétés aux méthodes TDGIA et AFGSM.
+\end{itemize}
+
+\subsection{Statistiques globales et optimisation séquentielle}\duree{3 min}
+\begin{itemize}
+    \item Étudier les moyens de limiter les changements à la loi de puissance
+    des degrés, au nombre de composantes connexes et au nombre de triangles,
+    notamment dans NIPA et Greedy-GAN.
+    \item Comparer l'optimisation globale à l'ajout séquentiel des nœuds
+    injectés.
+\end{itemize}
+
+\subsection{Homophilie et mécanismes de défense}\duree{3 min}
+\begin{itemize}
+    \item Définir l'homophilie centrée sur les nœuds et l'homophilie centrée
+    sur les arêtes.
+    \item Présenter les défenses fondées sur la restauration de l'homophilie
+    (GNNGuard et élagage par similarité cosinus) ainsi que la régularisation
+    des représentations (LayerNorm et RobustGCN).
+    \item Examiner le contournement de ces défenses par la contrainte
+    d'homophilie HAO.
+\end{itemize}
+
+\subsection{Synthèse multicritère et démonstration}\duree{3 min + 5 min de démonstration}
+\begin{itemize}
+    \item Récapituler les compromis entre attaques et défenses, sur des graphes
+    de petite et de grande taille.
+    \item Présenter et lancer une démonstration pratique sur le jeu de données
+    Cora.
+\end{itemize}
+
+\end{document}
